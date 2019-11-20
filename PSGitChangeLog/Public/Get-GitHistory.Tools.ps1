@@ -1,4 +1,4 @@
-Function Get-GitHistory {
+﻿Function Get-GitHistory {
     <#
         .SYNOPSIS
             Converts gitlog output into structured format
