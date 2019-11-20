@@ -9,6 +9,7 @@ trigger:
 pool:
   vmImage: 'windows-latest'
 
+steps:
 - powershell: |
     invoke-Pester -Path ./Tests
   displayName: 'Pester'
