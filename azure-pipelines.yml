@@ -7,11 +7,7 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  vmImage: 'windows-latest'
 
 - powershell: |
     invoke-Pester -Path ./Tests
