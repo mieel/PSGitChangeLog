@@ -24,6 +24,9 @@ Function Get-GitTagList {
     ForEach ($x in $gittagdata) {
         $commit, $tag, $date = $x -split '##'
         $tagvalue = $tag.Replace('refs/tags/', '')
+        If ($date -in $null, '') {
+            $date = git show -s --format=%ci $commit
+        }
 
         $tagParts = $tagvalue -Split '-'
         ForEach ($tagPart in $tagParts) {
@@ -34,6 +37,7 @@ Function Get-GitTagList {
                 $SemVerId = [System.Version] $tagpart
                 # Tags needs to have a date
                 $tagDate = [datetime]::ParseExact($date.Substring(0, 19), 'yyyy-MM-dd HH:mm:ss', $null)
+
                 Try {
                     $Tag = if ($TagPrefix) { "$TagPrefix-$SemVerId" } Else { "$TagValue" }
                     $taglist += [pscustomobject]@{
