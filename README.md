@@ -161,6 +161,9 @@ Or Json
 ```
 
 # How to use
+Install from the PSGallery  
+`Install-Module PSGitChangeLog`  
+
 If you want a Markdown document  
 `Get-GitHistory -OutputAs md`  
 
