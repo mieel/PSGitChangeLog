@@ -39,4 +39,4 @@ steps:
 - task: PowerShell@2
   inputs:
     filePath: 'Publish-ToPSGallery'
-    arguments: '-nuGetApiKey $(PSGallery_PAT) -moduleVersion $(Build.SemVerId))'
+    arguments: '-nuGetApiKey $(PSGallery_PAT) -moduleVersion $(Build.SemVerId)'
