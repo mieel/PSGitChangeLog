@@ -40,7 +40,7 @@ steps:
   displayName: New Semver 
 
 - powershell: |
-    Install-Module PSGitChangeLog    
+    Install-Module PSGitChangeLog -Scope CurrentUser -Force 
     Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
   displayName: Create Changelog
 - task: PowerShell@2
