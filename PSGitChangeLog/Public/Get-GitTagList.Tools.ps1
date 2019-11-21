@@ -1,4 +1,4 @@
-Function Get-GitTagList {
+﻿Function Get-GitTagList {
     <#
         .SYNOPSIS
             Gets a normalized list of Git Tags of the current Git Repo
@@ -9,15 +9,18 @@ Function Get-GitTagList {
             Get-GitTagList
     #>
     Param (
+        [string]
         $TagPrefix
         ,
-        [switch] $Latest
+        [switch]
+        $Latest
         ,
-        [switch] $GitVersionContiniousDeploymentMode
+        [switch]
+        $GitVersionContiniousDeploymentMode
     )
 
     $gittagdata = git for-each-ref --sort=taggerdate --format='%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)##%(refname)##%(taggerdate:iso)' refs/tags
-    If ($TagPrefix) {
+    If ($TagPrefix -notin $null,'') {
         $gittagdata = $gittagdata | Where-Object { $_ -match "refs/tags/$TagPrefix-" }
     }
     $taglist = @()
@@ -30,7 +33,7 @@ Function Get-GitTagList {
 
         $tagParts = $tagvalue -Split '-'
         ForEach ($tagPart in $tagParts) {
-            If ($TagPrefix -and $tagPart -eq $TagPrefix) { continue }
+            If ($TagPrefix -notin $null,'' -and $tagPart -eq $TagPrefix) { continue }
             $tagPart = $tagPart.Replace('v', '')
             Try {
                 # Tags needs to be a valid SemVerId
