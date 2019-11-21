@@ -11,7 +11,7 @@ pool:
 
 steps:
 - powershell: |
-    Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck
+    Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck -Force
     $TestResults = Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
     
     if ($TestResults.FailedCount -gt 0) {
