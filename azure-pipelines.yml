@@ -11,7 +11,7 @@ pool:
 
 steps:
 - powershell: |
-    Install-Module PSScriptAnalyzer
+    Install-Module PSScriptAnalyzer -Scope Currentuser
     Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
   displayName: 'Pester'
 
@@ -27,4 +27,5 @@ steps:
 
     $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
 
-    $NewVersion
+    Write-Host New SemVer is: $NewVersion
+  displayName: New Semver
