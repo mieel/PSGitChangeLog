@@ -13,7 +13,7 @@ Write-Host "ModuleVersion: $moduleVersion"
 $manifestPath = Resolve-Path -Path "*\PSGitChangelog.psd1"
 Write-Host "Manifest Path: $manifestPath"
 
-$Releasenotes = Get-Githistory -OutputAs md
+$Releasenotes = Get-Content Changelog.md
 
 Update-ModuleManifest -ReleaseNotes $releaseNotes -Path $manifestPath.Path -ModuleVersion $moduleVersion #-Verbose
 
