@@ -11,5 +11,6 @@ pool:
 
 steps:
 - powershell: |
+    Install-Module PSScriptAnalyzer
     invoke-Pester -Path ./Tests
   displayName: 'Pester'
