@@ -12,5 +12,19 @@ pool:
 steps:
 - powershell: |
     Install-Module PSScriptAnalyzer
-    invoke-Pester -Path ./Tests
+    Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
   displayName: 'Pester'
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'NUnit'
+    testResultsFiles: '**/Test*.xml'
+
+- powershell: |
+    $Module = find-module psgitchangelog
+
+    [version]$Version = $Module.Version
+
+    $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
+
+    $NewVersion
