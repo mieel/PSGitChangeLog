@@ -42,3 +42,16 @@ steps:
     filePath: 'Publish-ToPSGallery.ps1'
     arguments: '-nuGetApiKey $(PSGallery_PAT) -moduleVersion $(Build.SemVerId)'
   displayName: Publish-ToPSGallery.ps1
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'Github Repos'
+    repositoryName: '$(Build.Repository.Name)'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'userSpecifiedTag'
+    tag: '$(Build.SemVerId)'
+    title: 'Version $(Build.SemVerId)'
+    releaseNotesFilePath: 'README.md'
+    changeLogCompareToRelease: 'lastFullRelease'
+    changeLogType: 'commitBased'
