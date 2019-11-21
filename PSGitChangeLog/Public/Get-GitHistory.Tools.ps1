@@ -18,7 +18,9 @@
     [cmdletbinding()]
 
     param(
-        $Level
+        [ValidateSet("Public", "Internal")]
+        [string]
+        $Audience
         ,
         [string]
         $WorkDir
@@ -53,40 +55,10 @@
 
         $CurrentBranch = $env:Build_SourceBranchName
 
-        $CommitCodes = @(
-            @{
-                code            = '🐛', '🚑', 'bf:', 'bug:', 'prob:'
-                description     = 'Bugs, Problems'
-                DefaultAudience = 'all'
-                Order           = 2
-            }, @{
-                code            = '👌', '📦', '✨', 'new:', 'impr:'
-                description     = 'New features, Improvements'
-                DefaultAudience = 'all'
-                Order           = 1
-            }, @{
-                code            = '👷‍♂️', '⚙', '✅', 'ci:', 'cfg:', 'adm:', '💚'
-                description     = 'Configuration, Testing'
-                DefaultAudience = 'internal'
-                Order           = 4
-            }, @{
-                code            = '📝'
-                description     = 'Documentation'
-                DefaultAudience = 'internal'
-                Order           = 3
-            }, @{
-                code            = '✏', '♻', '🎨', 'rf:', 'opt:'
-                description     = 'Code Optimization, Refactoring'
-                DefaultAudience = 'all'
-                Order           = 5
-            }, @{
-                code            = 'Other'
-                description     = 'Other'
-                DefaultAudience = 'all'
-                Order           = 6
-            }
-        )
-        $Omit = 'RE:', 'Merged', 'azure-pipelines.yml edited online with Bitbucket'
+        $config = Import-PowerShellDataFile -Path  $PSScriptRoot/../PSGitChangeLog.Config.psd1
+        $Intents = $config.Intents
+        
+        $Omit = $config.Omit
     }
     Process {
         If (!$ProjectName) {
@@ -121,9 +93,13 @@
             #Skip output if match with Omit
             If ($Omit | Where-Object { $Commit.Subject -match $_ }) { Continue }
 
-            $CommitCode = $CommitCodes.Code | Where-Object { $Commit.Subject -match $_ } | Select-Object -First 1
-            If ( $null -eq $CommitCode) {
-                $CommitCode = 'Other'
+            $IntentCode = $Intents.Code | Where-Object { $Commit.Subject -match $_ } | Select-Object -First 1
+            If ( $null -eq $IntentCode) {
+                $IntentCode = 'Other'
+            }
+            $Intent = $Intents | Where-Object { $_.Code -contains $IntentCode }            
+            If ($Audience -eq 'Public' -and $Intent.DefaultAudience -eq 'internal') {
+                Continue
             }
             If ($Commit.Subject.Length -lt $RequiredCommitMessageLength) {
                 Write-Host "Commit message: $message is considered too short ($RequiredCommitMessageLength). Ommitting from changelog..."
@@ -136,14 +112,15 @@
                 ReleaseVersionid = $TagSemVerId
                 ReleaseCommit    = $TagCommit
                 ReleaseDate      = $TagDate
-                IntentCode       = $CommitCode
-                Intent           = ($CommitCodes | Where-Object { $_.Code -contains $CommitCode }).Description
-                Audience         = ($CommitCodes | Where-Object { $_.Code -contains $CommitCode }).DefaultAudience
+                IntentCode       = $IntentCode
+                Intent           = $Intent.Description
+                Audience         = $Intent.DefaultAudience
                 Message          = $Commit.Subject
                 IssueKey         = $IssueKey
                 CommitId         = $Commit.CommitId
-                Order            = ($CommitCodes | Where-Object { $_.Code -contains $CommitCode }).Order
+                Order            = $Intents.Order
             }
+            
             Write-Output $log
         } #ForEach
 
