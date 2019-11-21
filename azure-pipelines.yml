@@ -34,4 +34,9 @@ steps:
     $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
 
     Write-Host New SemVer is: $NewVersion
-  displayName: New Semver
+    Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
+  displayName: New Semver 
+- task: PowerShell@2
+  inputs:
+    filePath: 'Publish-ToPSGallery'
+    arguments: '-nuGetApiKey $(PSGallery_PAT) -moduleVersion $(Build.SemVerId))'
