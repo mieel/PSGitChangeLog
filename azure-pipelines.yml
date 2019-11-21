@@ -39,9 +39,9 @@ steps:
   displayName: New Semver 
 
 - powershell: |
-    Import-Module ./PSGitChangeLog -force
+    Install-Module PSGitChangeLog
     Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
-    
+  displayName: Create Changelog
 - task: PowerShell@2
   inputs:
     filePath: 'Publish-ToPSGallery.ps1'
