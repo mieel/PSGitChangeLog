@@ -1,10 +1,12 @@
 Param (
     $nuGetApiKey = $env:PSGallery_PAT
+    ,
+    $moduleVersion = $env:Gitversion_SemVerId
 )
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
 $releaseNotes = $env:RELEASE_NOTES
-$moduleVersion = $env:Gitversion_SemVerId
+
 Write-Host "ModuleVersion: $moduleVersion"
 
 $manifestPath = Resolve-Path -Path "*\*.psd1"

@@ -1,4 +1,4 @@
-# $projectRoot = Resolve-Path "F:\rdcinmotiv\Plumber\Tests\.."
+
 $projectRoot = Resolve-Path "$PSScriptRoot\.."
 $moduleRoot = Split-Path (Resolve-Path "$projectRoot\*\*.psm1")
 $moduleName = Split-Path $moduleRoot -Leaf
@@ -23,7 +23,6 @@ Describe "PSScriptAnalyzer rule-sets" -Tag Build {
                         $message = "{0} Line {1}: {2}" -f $rule.Severity, $rule.Line, $rule.message
                         $message | Should -Be ""
                     }
-
                 }
             } else {
                 It "Should not fail any rules" {

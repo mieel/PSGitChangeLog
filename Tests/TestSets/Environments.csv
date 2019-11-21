@@ -1,7 +1,0 @@
-﻿Key;Development;Test;Acceptance;Staging;Production
-SqlServerinstance;imb-app-d-001.westeurope.cloudapp.azure.com;imb-app-d-001.westeurope.cloudapp.azure.com;uat001.inmotiv.combell;uat001.inmotiv.combell;sql001.inmotiv.combell
-DatabaseName;NissanCRMDevelopment;NissanCRMTest;NissanCRMAcceptance;NissanCRMStaging;NissanCRM
-DataWarehouseName;NissanCRMDatawarehouseDevelopment;NissanCRMDatawarehouseTest;NissanCRMDatawarehouseAcceptance;NissanCRMDatawarehouseStaging;NissanCRMDatawarehouse
-SmtpServer;localhost;localhost;uatmail.inmotiv.combell;uatmail.inmotiv.combell;mail.inmotiv.combell
-LeadErrorsSender;[Dev] Leads Errors;[Test] Leads Errors;[Acc] Leads Errors;[Stg] Leads Errors;Leads Errors
-LeadErrorsSenderAddress;noreply@inmotiv.be;noreply@inmotiv.be;noreply@inmotiv.be;noreply@inmotiv.be;noreply@inmotiv.be

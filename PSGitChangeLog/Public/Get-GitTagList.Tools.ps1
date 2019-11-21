@@ -6,7 +6,7 @@
         .EXAMPLE
             Get-GitTagList -TagPrefix plumber -Latest
         .EXAMPLE
-            Get-GitTagList
+            Get-GitTagList -TagPrefix ''
     #>
     Param (
         [string]
