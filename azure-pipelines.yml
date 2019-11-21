@@ -36,10 +36,11 @@ steps:
 
     Write-Host New SemVer is: $NewVersion
     Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
+    git tag $NewVersion
   displayName: New Semver 
 
 - powershell: |
-    Install-Module PSGitChangeLog
+    Install-Module PSGitChangeLog    
     Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
   displayName: Create Changelog
 - task: PowerShell@2
