@@ -179,4 +179,12 @@ Only output latest x version
 `Get-GitHistory -OutputAs md -Latest Minor`  (Outputs all builds of the currenct Minor release)  
 `Get-GitHistory -OutputAs md -Latest Build`  (Outputs the latest build release)
 
-#
+# Use it in CI
+```
+# PowerShell Task
+Install-Module PSGitChangeLog -Scope CurrentUser -Force
+Import-Module PSGitChangeLog
+Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
+```
+When you create a Github Release, you can use this .md document as the ChangeLog:
+https://github.com/mieel/PSGitChangeLog/releases
