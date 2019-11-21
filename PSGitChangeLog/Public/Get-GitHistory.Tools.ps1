@@ -20,22 +20,30 @@
     param(
         $Level
         ,
+        [string]
         $WorkDir
         ,
+        [int]
         $RequiredCommitMessageLength = 5
         ,
+        [string]
         $ProjectName
         ,
+        [string]
         $TagPrefix
         ,
         [string]
         $RemoteName = 'origin'
         ,
-        [switch] $asJson
+        [string] 
+        $OutputAs
         ,
         [String]
         $Latest = ''
         # Specify to retrieve the latest Major, Minor, Build
+        ,
+        [switch]
+        $toChangelog
     )
     # Settings
     Begin {
@@ -98,11 +106,9 @@
         # Normalizing log entries
         $logs = @()
 
-        $TagValue = ''
+        $TagValue = 'Unreleased'
 
         $logs = ForEach ($Commit in $gitHist) {
-            #$commit = $gitHist | select-object -first 1
-
             #Set the current Version/Tag in the history
             $tag = $Releases | Where-Object { $_.Commit -eq $Commit.commitid } | Select-Object -last 1
             if ($tag) {
@@ -123,7 +129,7 @@
                 Write-Host "Commit message: $message is considered too short ($RequiredCommitMessageLength). Ommitting from changelog..."
                 Continue
             }
-            $IssueKey = Test-JiraIssueKey($Commit.Subject)
+            $IssueKey = Test-IssueKey($Commit.Subject)
             $log = [pscustomobject]@{
                 Project          = $ProjectName
                 Release          = $TagValue
@@ -141,7 +147,7 @@
             Write-Output $log
         } #ForEach
 
-        If (!$asJSON) { return $logs }
+        If ($OutputAs -eq 'psobject') { return $logs }
 
         $Releasedata = @()
 
@@ -160,6 +166,16 @@
                 $Releases = $Releases | Where-Object { $_.Major -eq $Major -and $_.Minor -eq $Minor }
             }
         }
+        If ($logs | Where-Object { $_.Release -eq 'Unreleased' } ) {
+            $Releasedata += [ordered]@{
+                    Release       = 'Unreleased'
+                    ReleaseDate   = ''
+                    Component     = ''
+                    Version       = ''
+                    ReleaseCommit = ''
+                    Commits       = $logs | Where-Object { $_.Release -eq 'Unreleased'} | SOrt-Object -Property Order | Select-Object -Property * -ExcludeProperty Project, Release, Order
+                }
+        }
         Write-Host $Releases.Count Releases
         $Releasedata += ForEach ($Release in $Releases) {
             [ordered]@{
@@ -172,14 +188,21 @@
             }
         }
 
-        $Json = @{
+        $Data = @{
             Project  = $ProjectName
             Releases = $Releasedata
         }
 
-        $output = $Json | ConvertTo-Json -depth 4
+        $Json = $Data | ConvertTo-Json -depth 4
+        
+        If ($OutputAs -eq 'json') { Return $json }
 
-        Return $output
-
+        If ($OutputAs -eq 'md'){
+            $Changelog = ConvertTo-Changelog($Json) -FormatAs md
+            Return $Changelog
+        } elseif ($OutputAs -eq 'html') {
+            $Changelog = ConvertTo-Changelog($Json) -FormatAs html
+            Return $Changelog   
+        }        
     }
 }

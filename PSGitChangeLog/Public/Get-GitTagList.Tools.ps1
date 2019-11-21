@@ -39,10 +39,16 @@ Function Get-GitTagList {
                 $tagDate = [datetime]::ParseExact($date.Substring(0, 19), 'yyyy-MM-dd HH:mm:ss', $null)
 
                 Try {
-                    $Tag = if ($TagPrefix) { "$TagPrefix-$SemVerId" } Else { "$TagValue" }
+                    if ($TagPrefix) { 
+                        $tag = "$TagPrefix-$SemVerId"
+                        $component = $TagPrefix 
+                    } Else { 
+                        $tag = "$TagValue"
+                        $Component = If ($tagParts.count -gt 1) {$tagParts | Select-Object -First 1} Else {''}
+                    }
                     $taglist += [pscustomobject]@{
                         Tag       = $Tag
-                        Component = $Tag -split '-' | Select-Object -first 1
+                        Component = $Component
                         Commit    = $commit
                         Date      = $tagDate
                         SemVerId  = $SemVerId
