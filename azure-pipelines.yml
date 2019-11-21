@@ -37,6 +37,11 @@ steps:
     Write-Host New SemVer is: $NewVersion
     Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
   displayName: New Semver 
+
+- powershell: |
+    Import-Module ./PSGitChangeLog -force
+    Get-GitHistory -OutputAs md | Set-Content Changelog.md
+    
 - task: PowerShell@2
   inputs:
     filePath: 'Publish-ToPSGallery.ps1'
