@@ -27,11 +27,15 @@
 
     )
     Begin {
+       
+        $config = Import-PowerShellDataFile -Path  $PSScriptRoot/../PSGitChangeLog.Config.psd1
+        $PackageUri = $config.PackageUri
+        $CommitBaseUri = $config.CommitBaseUri
+        $IssueLinkUri = $config.IssueLinkUri
+
         $Data = $InputObject | ConvertFrom-Json
-        $Releases = $Data.Releases
-        #$UPackageUri = "https://dev.azure.com/rdcinmotiv/imb-Operations/_packaging?_a=package&feed=WebdivPackages&package=frontplateprocessor&version=1.2.2&protocolType=UPack"
-        $CommitBaseUri = "https://bitbucket.org/inmotivbelgium/$ProjectName/commits"
-        $JiraIssueUri = "https://rdcgroup.atlassian.net/browse"
+        $Releases = $Data.Releases        
+        
         $Components = $Releases.Component | Select-Object -Unique
         Write-Host "Documenting $($Releases.Release -join ', ')"
     }
@@ -45,29 +49,33 @@
             }
         }
         ForEach ($Component in $Components) {
-            $content += Switch ($formatAs) {
-                'md' { Write-Output  "`n# $Component" }
-                'html' { Write-Output "`n<h1>$Component</h1>" }
+            If ($Component -notin $null,'') {
+                $content += Switch ($formatAs) {
+                    'md' { Write-Output  "`n# Component: $Component" }
+                    'html' { Write-Output "`n<h1>Component: $Component</h1>" }
+                }
             }
             $Content += ForEach ($Release in $Releases | Where-Object { $_.Component -eq $Component }) {
                 $ReleaseName = $Release.Release
                 $ReleaseDate = $Release.ReleaseDate
-                $VersionId = [version]$Release.Version
-                If ($Minor -ne "$($VersionId.Major).$($VersionId.Minor)") {
-                    $Minor = "$($VersionId.Major).$($VersionId.Minor)"
-                    Switch ($formatAs) {
-                        'md' { Write-Output  "`n## $minor" }
-                        'html' { Write-Output "`n<hr /><h2>$minor</h2>" }
-                    }
+                If ($ReleaseName -ne 'Unreleased') {
+                    $VersionId = [version]$Release.Version
+                    If ($Minor -ne "$($VersionId.Major).$($VersionId.Minor)") {
+                        $Minor = "$($VersionId.Major).$($VersionId.Minor)"
+                        Switch ($formatAs) {
+                            'md' { Write-Output  "`n## Version $minor" }
+                            'html' { Write-Output "`n<hr /><h2>Version $minor</h2>" }
+                        }
 
+                    }
                 }
-                If ($PackageUrl) {
-                    $DownloadLink = "$PackageUrl" + "$VersionId"
+                If ($PackageUri) {
+                    $DownloadUri = "$PackageUri" + "$VersionId"
                 }
                 $ReleaseCommits = ($Data.Releases | Where-Object { $_.Release -eq $Release.Release }).Commits
                 Switch ($formatAs) {
                     'md' {
-                        If ($PackageUrl) { $DownloadLink = "[📥]($DownloadLink)" }
+                        If ($null -eq $DownloadUri) { $DownloadLink = "[📥]($DownloadLink)" }
                         $ReleaseTitle = "`n### $ReleaseName [👨‍💻]($CommitBaseUri/$($Release.ReleaseCommit)) $DownloadLink $ReleaseDate"
 
                     }'html' {
@@ -94,7 +102,7 @@
                         $currentmessage = $_.message
                         $Log = $_
                         $CommitSHA = $_.CommitId.Substring(0, 8)
-                        $CommitLink = "$CommitBaseUri/$CommitId"
+                        $CommitLink = "$CommitBaseUri/$CommitSHA"
                         $Output = Switch ($formatAs) {
 
                             'md' { Write-Output  "- $($Log.Message) - @[$CommitSHA]($CommitLink)" }
@@ -105,27 +113,27 @@
                             #Place the issue key at the end
                             $Output = $Output.Replace($IssueKey, "")
                             $Output = Switch ($formatAs) {
-                                'md' { "$Output #[$IssueKey]($JiraIssueUri/$IssueKey)" }
-                                'html' { "$Output #<a href=`"$JiraIssueUri/$IssueKey`">$IssueKey</a>" }
+                                'md' { "$Output #[$IssueKey]($IssueLinkUri/$IssueKey)" }
+                                'html' { "$Output #<a href=`"$IssueLinkUri/$IssueKey`">$IssueKey</a>" }
                             }
                         }
                         Write-Output "$Output`n"
                     }
-                If ($messages) {
-                    Write-debug ($messages | Out-String)
-                    Switch ($formatAs) {
-                        'md' {
-                            Write-Output  "`n#### $Intent`n"
-                            Write-Output $messages
-                        }'html' {
-                            Write-Output "<h4 style=`"margin-left: 30.0px;`">$Intent</h4>`n"
-                            Write-Output $messages | ForEach-Object { "<p style=`"margin-left: 60.0px;`">$_</p>" }
+                    If ($messages) {
+                        Write-debug ($messages | Out-String)
+                        Switch ($formatAs) {
+                            'md' {
+                                Write-Output  "`n#### $Intent`n"
+                                Write-Output $messages
+                            } 'html' {
+                                Write-Output "<h4 style=`"margin-left: 30.0px;`">$Intent</h4>`n"
+                                Write-Output $messages | ForEach-Object { "<p style=`"margin-left: 60.0px;`">$_</p>" }
+                            }
                         }
                     }
-                }
-            } # ForEach Intent
-        } #ForEach Release
-    } #ForEach Component
-    Write-Output $Content
-} #Process
+                } # ForEach Intent
+            } #ForEach Release
+        } #ForEach Component
+        Write-Output $Content
+    } #Process
 }
