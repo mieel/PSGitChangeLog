@@ -12,7 +12,13 @@ pool:
 steps:
 - powershell: |
     Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck
-    Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
+    $TestResults = Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
+    
+    if ($TestResults.FailedCount -gt 0) {
+        Throw "Failed '$($TestResults.FailedCount)' tests, build failed"
+        Exit
+    }
+
   displayName: 'Pester'
 
 - task: PublishTestResults@2
