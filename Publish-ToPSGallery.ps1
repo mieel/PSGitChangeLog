@@ -1,3 +1,6 @@
+Param (
+    $nuGetApiKey = $env:PSGallery_PAT
+)
 Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
 
 $releaseNotes = $env:RELEASE_NOTES
@@ -17,8 +20,6 @@ $modulePath = Split-Path -Parent $moduleFilePath
 Write-Host "Module Path: $modulePath"
 
 $module = $modulePath | Split-Path -leaf
-
-$nuGetApiKey = $env:PSGallery_PAT
 
 try {
     Publish-Module -Path $modulePath -NuGetApiKey $nuGetApiKey -ErrorAction Stop -Force
