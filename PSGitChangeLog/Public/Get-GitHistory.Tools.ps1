@@ -37,6 +37,7 @@
         [string]
         $RemoteName = 'origin'
         ,
+        [ValidateSet("psobject", "json","md","html")]
         [string] 
         $OutputAs
         ,
