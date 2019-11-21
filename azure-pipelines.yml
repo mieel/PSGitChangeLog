@@ -12,6 +12,7 @@ pool:
 steps:
 - powershell: |
     Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck -Force
+    Install-Module Pester -Scope Currentuser -SkipPublisherCheck -Force
     $TestResults = Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
     
     if ($TestResults.FailedCount -gt 0) {
@@ -40,3 +41,4 @@ steps:
   inputs:
     filePath: 'Publish-ToPSGallery.ps1'
     arguments: '-nuGetApiKey $(PSGallery_PAT) -moduleVersion $(Build.SemVerId)'
+  displayName: Publish-ToPSGallery.ps1
