@@ -57,6 +57,6 @@ steps:
     tagSource: 'userSpecifiedTag'
     tag: '$(Build.SemVerId)'
     title: 'Version $(Build.SemVerId)'
-    releaseNotesFilePath: 'README.md'
+    releaseNotesFilePath: 'Changelog.md'
     changeLogCompareToRelease: 'lastFullRelease'
     changeLogType: 'commitBased'
