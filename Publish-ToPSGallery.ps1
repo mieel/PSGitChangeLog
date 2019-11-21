@@ -9,9 +9,11 @@ $releaseNotes = $env:RELEASE_NOTES
 
 Write-Host "ModuleVersion: $moduleVersion"
 
-$manifestPath = Resolve-Path -Path "*\*.psd1"
+
+$manifestPath = Resolve-Path -Path "*\PSGitChangelog.psd1"
 Write-Host "Manifest Path: $manifestPath"
 
+$Releasenotes = Get-Githistory -OutputAs md
 
 Update-ModuleManifest -ReleaseNotes $releaseNotes -Path $manifestPath.Path -ModuleVersion $moduleVersion #-Verbose
 
