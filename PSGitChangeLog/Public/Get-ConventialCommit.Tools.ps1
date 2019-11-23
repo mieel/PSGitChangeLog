@@ -10,9 +10,11 @@ Function Get-ConventialCommit {
             Get-ConventialCommit -CommitMessage 'plain text commit message'
     #>  
     Param (
+        [string]
         $CommitMessage = 'feat(webapi): Add new feature'
         ,
-        $ConfigFile = 'D:\github-mieel\PSGitChangeLog\PSGitChangeLog\PSGitChangeLog.Config.psd1'
+        [string]
+        $ConfigFile = '$PSScriptRoot\..\PSGitChangeLog.Config.psd1'
     )
     $config = Import-PowerShellDataFile -Path $ConfigFile
     $Intents = $config.Intents
