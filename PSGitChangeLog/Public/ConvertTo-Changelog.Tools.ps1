@@ -76,7 +76,7 @@
                 Switch ($formatAs) {
                     'md' {
                         If ($null -eq $DownloadUri) { $DownloadLink = "[📥]($DownloadLink)" }
-                        $ReleaseTitle = "`n### $ReleaseName [👨‍💻]($CommitBaseUri/$($Release.ReleaseCommit)) $DownloadLink $ReleaseDate"
+                        $ReleaseTitle = "`n### $ReleaseName`n [👨‍💻 $($Release.ReleaseCommit.Substring(0, 8))]($CommitBaseUri/$($Release.ReleaseCommit)) $DownloadLink - *$ReleaseDate*`n"
 
                     }'html' {
                         If ($PackageUrl) { $DownloadLink += " <a href=`"$DownloadLink`">📥</a><" }
