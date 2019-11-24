@@ -2,7 +2,8 @@
 Powershell Module to convert a Git log to a readable format (md or html)
 
 # How it works
-**Intents** are defined in the `/PSGitChangelog.Config.psd1` Configuration file, each Intent can have more than one Code.  
+**Intents** are defined in the `/PSGitChangelog.Config.psd1` Configuration file, each Intent can have more than one Code.
+UPDATE: this module is now (or tries to) compliant to the [Convential Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 Whenever a Commit Message mentions that Code, it will be classed as that Intent: e.g Bugfix, New Feature, Configuration...
 see file: `/PSGitChangelog.Config.psd1` (you can customize it)
 Each Intent also has an order in which it would appear on the Changelog. For example if you would want Bug fixes to rank higher than Configuration changes, you can do that by specifying the `order` property.
@@ -165,19 +166,22 @@ Install from the PSGallery
 `Install-Module PSGitChangeLog`  
 
 If you want a Markdown document  
-`Get-GitHistory -OutputAs md`  
+`Get-GitChangelog -OutputAs md`  
 
 If you want a html document  
-`Get-GitHistory -OutputAs html`
+`Get-GitChangelog -OutputAs html`
 
 If you want a json/psobject object, so that you can apply your own formatting  
-`Get-GitHistory -OutputAs json`  
-`Get-GitHistory -OutputAs psobject`
+`Get-GitChangelog -OutputAs json`  
+`Get-GitChangelog -OutputAs psobject`
 
 Only output latest x version  
-`Get-GitHistory -OutputAs md -Latest Major`  (Outputs all minor/builds of the current Major release)  
-`Get-GitHistory -OutputAs md -Latest Minor`  (Outputs all builds of the currenct Minor release)  
-`Get-GitHistory -OutputAs md -Latest Build`  (Outputs the latest build release)
+`Get-GitChangelog -OutputAs md -Latest Major`  (Outputs all minor/builds of the current Major release)  
+`Get-GitChangelog -OutputAs md -Latest Minor`  (Outputs all builds of the currenct Minor release)  
+`Get-GitChangelog -OutputAs md -Latest Build`  (Outputs the latest build release)
+
+Get all Tag/Releases
+`Get-GitTagList`
 
 # Use it in CI
 ```
