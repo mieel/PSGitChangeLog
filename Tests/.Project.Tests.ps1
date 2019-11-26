@@ -11,6 +11,7 @@ Describe "PSScriptAnalyzer rule-sets" -Tag Build {
         'PSAvoidUsingConvertToSecureStringWithPlainText'
         'PSAvoidTrailingWhitespace'
         'PSUseShouldProcessForStateChangingFunctions'
+        'PSUseBOMForUnicodeEncodedFile'
     )
     $Rules = Get-ScriptAnalyzerRule | Where-Object { $_.RuleName -notin $IgnoreRules }
     $scriptfiles = Get-ChildItem -Path $projectRoot -File -recurse -Include '*.ps1' | Where-Object { ($_.Directory).Name -ne 'TestSets' }
