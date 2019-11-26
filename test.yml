@@ -6,44 +6,47 @@
 pr:
   branches:
     include:
-      - '*'
+      - "*"
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: "windows-latest"
 
 steps:
-- powershell: |
-    Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck -Force
-    Install-Module Pester -Scope Currentuser -SkipPublisherCheck -Force
-    $TestResults = Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
-    
-    if ($TestResults.FailedCount -gt 0) {
-        Throw "Failed '$($TestResults.FailedCount)' tests, build failed"
-        Exit
-    }
+  - powershell: |
+      Get-ChildItem $env | Where-Object {$_.Name -like 'Build*' -or $_.Name -like 'System*'}
+    displayName: Pipeline Variables
 
-  displayName: 'Pester'
+  - powershell: |
+      Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck -Force
+      Install-Module Pester -Scope Currentuser -SkipPublisherCheck -Force
+      $TestResults = Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
 
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'NUnit'
-    testResultsFiles: '**/Test*.xml'
+      if ($TestResults.FailedCount -gt 0) {
+          Throw "Failed '$($TestResults.FailedCount)' tests, build failed"
+          Exit
+      }
 
-- powershell: |
-    $Module = find-module psgitchangelog
+    displayName: "Pester"
 
-    [version]$Version = $Module.Version
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: "NUnit"
+      testResultsFiles: "**/Test*.xml"
 
-    $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
+  - powershell: |
+      $Module = find-module psgitchangelog
 
-    Write-Host New SemVer is: $NewVersion
-    Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
-    git tag $NewVersion
-  displayName: New Semver 
+      [version]$Version = $Module.Version
 
-- powershell: |
-    Install-Module PSGitChangeLog -Scope CurrentUser -Force
-    Import-Module PSGitChangeLog
-    Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
-  displayName: Create Changelog
-  
+      $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
+
+      Write-Host New SemVer is: $NewVersion
+      Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
+      git tag $NewVersion
+    displayName: New Semver
+
+  - powershell: |
+      Install-Module PSGitChangeLog -Scope CurrentUser -Force
+      Import-Module PSGitChangeLog
+      Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
+    displayName: Create Changelog
