@@ -13,7 +13,7 @@ pool:
 
 steps:
   - powershell: |
-      Get-ChildItem $env | Where-Object {$_.Name -like 'Build*' -or $_.Name -like 'System*'}
+      Get-ChildItem env: | Where-Object {$_.Name -like 'Build*' -or $_.Name -like 'System*'}
     displayName: Pipeline Variables
 
   - powershell: |
