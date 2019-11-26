@@ -36,8 +36,8 @@
         [string]
         $RemoteName = 'origin'
         ,
-        [ValidateSet("psobject", "json","md","html")]
-        [string] 
+        [ValidateSet("psobject", "json", "md", "html")]
+        [string]
         $OutputAs
         ,
         [String]
@@ -71,8 +71,6 @@
         $gitHist = $gitlog | ConvertFrom-Csv -Delimiter "`t" -Header ("Date", "CommitId", "Author", "Subject")
 
         $Releases = Get-GitTagList -TagPrefix $TagPrefix
-        # Normalizing log entries
-        $logs = @()
 
         $TagValue = 'Unreleased'
 
@@ -88,7 +86,7 @@
 
             #Skip output if match with Omit
             If ($Omit | Where-Object { $Commit.Subject -match $_ }) { Continue }
-         
+
             $ConventialCommitLog = Get-ConventialCommit -CommitMessage $Commit.Subject
             Write-Debug $ConventialCommitLog
 
@@ -98,7 +96,7 @@
             If ( $null -eq $IntentCode) {
                 $IntentCode = 'Other'
             }
-                      
+
             If ($Message -lt $RequiredCommitMessageLength) {
                 Write-Host "Commit message: $message is considered too short ($RequiredCommitMessageLength). Ommitting from changelog..."
                 Continue
@@ -118,11 +116,11 @@
                 CommitId         = $Commit.CommitId
                 Order            = $ConventialCommitLog.Order
             }
-            
+
             Write-Output $log
-        } #ForEach 
+        } #ForEach
     }
-} 
+}
 
 Function Get-GitChangeLog {
     Param (
@@ -145,8 +143,8 @@ Function Get-GitChangeLog {
         [string]
         $RemoteName = 'origin'
         ,
-        [ValidateSet("psobject", "json","md","html")]
-        [string] 
+        [ValidateSet("psobject", "json", "md", "html")]
+        [string]
         $OutputAs
         ,
         [String]
@@ -160,7 +158,7 @@ Function Get-GitChangeLog {
     $Releases = Get-GitTagList -TagPrefix $TagPrefix
 
     If ($Audience -eq 'Public' ) {
-        $logs = $logs | Where-Object {$_.IntentAudience -ne 'Internal'}
+        $logs = $logs | Where-Object { $_.IntentAudience -ne 'Internal' }
     }
     If ($OutputAs -eq 'psobject') { return $logs }
 
@@ -183,13 +181,13 @@ Function Get-GitChangeLog {
     }
     If ($logs | Where-Object { $_.Release -eq 'Unreleased' } ) {
         $Releasedata += [ordered]@{
-                Release       = 'Unreleased'
-                ReleaseDate   = ''
-                Component     = ''
-                Version       = ''
-                ReleaseCommit = ''
-                Commits       = $logs | Where-Object { $_.Release -eq 'Unreleased'} | SOrt-Object -Property Order | Select-Object -Property * -ExcludeProperty Project, Release, Order
-            }
+            Release       = 'Unreleased'
+            ReleaseDate   = ''
+            Component     = ''
+            Version       = ''
+            ReleaseCommit = ''
+            Commits       = $logs | Where-Object { $_.Release -eq 'Unreleased' } | SOrt-Object -Property Order | Select-Object -Property * -ExcludeProperty Project, Release, Order
+        }
     }
     Write-Host $Releases.Count Releases
     $Releasedata += ForEach ($Release in $Releases) {
@@ -209,14 +207,14 @@ Function Get-GitChangeLog {
     }
 
     $Json = $Data | ConvertTo-Json -depth 4
-    
+
     If ($OutputAs -eq 'json') { Return $json }
 
-    If ($OutputAs -eq 'md'){
+    If ($OutputAs -eq 'md') {
         $Changelog = ConvertTo-Changelog($Json) -FormatAs md
         Return $Changelog
     } elseif ($OutputAs -eq 'html') {
         $Changelog = ConvertTo-Changelog($Json) -FormatAs html
-        Return $Changelog   
-    }        
+        Return $Changelog
+    }
 }
