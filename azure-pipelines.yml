@@ -4,61 +4,66 @@
 # https://aka.ms/yaml
 
 trigger:
-- master
+  - master
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: "windows-latest"
 
 steps:
-- powershell: |
-    Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck -Force
-    Install-Module Pester -Scope Currentuser -SkipPublisherCheck -Force
-    $TestResults = Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
-    
-    if ($TestResults.FailedCount -gt 0) {
-        Throw "Failed '$($TestResults.FailedCount)' tests, build failed"
-        Exit
-    }
+  - powershell: |
+      Get-ChildItem env | Where-Object {$_.Name -like 'Build*' -or $_.Name -like 'System*'}
+    displayName: Pipeline Variables
 
-  displayName: 'Pester'
+  - powershell: |
 
-- task: PublishTestResults@2
-  inputs:
-    testResultsFormat: 'NUnit'
-    testResultsFiles: '**/Test*.xml'
+      Install-Module PSScriptAnalyzer -Scope Currentuser -SkipPublisherCheck -Force
+      Install-Module Pester -Scope Currentuser -SkipPublisherCheck -Force
+      $TestResults = Invoke-Pester -Path ./Tests -OutputFormat NUnitXml -OutputFile TestResults.xml -PassThru
 
-- powershell: |
-    $Module = find-module psgitchangelog
+      if ($TestResults.FailedCount -gt 0) {
+          Throw "Failed '$($TestResults.FailedCount)' tests, build failed"
+          Exit
+      }
 
-    [version]$Version = $Module.Version
+    displayName: "Pester"
 
-    $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: "NUnit"
+      testResultsFiles: "**/Test*.xml"
 
-    Write-Host New SemVer is: $NewVersion
-    Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
-    git tag $NewVersion
-  displayName: New Semver 
+  - powershell: |
+      $Module = find-module psgitchangelog
 
-- powershell: |
-    Install-Module PSGitChangeLog -Scope CurrentUser -Force
-    Import-Module PSGitChangeLog
-    Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
-  displayName: Create Changelog
-- task: PowerShell@2
-  inputs:
-    filePath: 'Publish-ToPSGallery.ps1'
-    arguments: '-nuGetApiKey $(PSGallery_PAT) -moduleVersion $(Build.SemVerId)'
-  displayName: Publish-ToPSGallery.ps1
+      [version]$Version = $Module.Version
 
-- task: GitHubRelease@1
-  inputs:
-    gitHubConnection: 'Github Repos'
-    repositoryName: '$(Build.Repository.Name)'
-    action: 'create'
-    target: '$(Build.SourceVersion)'
-    tagSource: 'userSpecifiedTag'
-    tag: '$(Build.SemVerId)'
-    title: 'Version $(Build.SemVerId)'
-    releaseNotesFilePath: 'Changelog.md'
-    changeLogCompareToRelease: 'lastFullRelease'
-    changeLogType: 'commitBased'
+      $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
+
+      Write-Host New SemVer is: $NewVersion
+      Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
+      git tag $NewVersion
+    displayName: New Semver
+
+  - powershell: |
+      Install-Module PSGitChangeLog -Scope CurrentUser -Force
+      Import-Module PSGitChangeLog
+      Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
+    displayName: Create Changelog
+  - task: PowerShell@2
+    inputs:
+      filePath: "Publish-ToPSGallery.ps1"
+      arguments: "-nuGetApiKey $(PSGallery_PAT) -moduleVersion $(Build.SemVerId)"
+    displayName: Publish-ToPSGallery.ps1
+
+  - task: GitHubRelease@1
+    inputs:
+      gitHubConnection: "Github Repos"
+      repositoryName: "$(Build.Repository.Name)"
+      action: "create"
+      target: "$(Build.SourceVersion)"
+      tagSource: "userSpecifiedTag"
+      tag: "$(Build.SemVerId)"
+      title: "Version $(Build.SemVerId)"
+      releaseNotesFilePath: "Changelog.md"
+      changeLogCompareToRelease: "lastFullRelease"
+      changeLogType: "commitBased"
