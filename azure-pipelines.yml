@@ -47,7 +47,7 @@ steps:
   - powershell: |
       Install-Module PSGitChangeLog -Scope CurrentUser -Force
       Import-Module PSGitChangeLog
-      Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
+      Get-GitChangelog -OutputAs md -latest Build | Set-Content Changelog.md -Encoding utf8
     displayName: Create Changelog
   - task: PowerShell@2
     inputs:
