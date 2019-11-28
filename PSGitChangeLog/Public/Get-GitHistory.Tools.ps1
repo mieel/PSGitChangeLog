@@ -185,7 +185,7 @@ Function Get-GitChangeLog {
             ReleaseDate   = ''
             Component     = ''
             Version       = ''
-            ReleaseCommit = ''
+            ReleaseCommit = git log --format="%H" -n 1
             Commits       = $logs | Where-Object { $_.Release -eq 'Unreleased' } | SOrt-Object -Property Order | Select-Object -Property * -ExcludeProperty Project, Release, Order
         }
     }
