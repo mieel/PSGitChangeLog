@@ -188,7 +188,7 @@ Get all Tag/Releases
 # PowerShell Task
 Install-Module PSGitChangeLog -Scope CurrentUser -Force
 Import-Module PSGitChangeLog
-Get-GitHistory -OutputAs md | Set-Content Changelog.md -Encoding utf8
+Get-GitChangelog -OutputAs md | Set-Content Changelog.md -Encoding utf8
 ```
 When you create a Github Release, you can use this .md document as the ChangeLog:
 https://github.com/mieel/PSGitChangeLog/releases
