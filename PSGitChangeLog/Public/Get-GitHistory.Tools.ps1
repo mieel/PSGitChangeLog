@@ -46,9 +46,6 @@
         ,
         [switch]
         $toChangelog
-        ,
-        [string]
-        $RemoteName = 'origin'
     )
     # Settings
     Begin {
