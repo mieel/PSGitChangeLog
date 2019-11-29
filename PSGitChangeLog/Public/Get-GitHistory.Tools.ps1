@@ -46,6 +46,9 @@
         ,
         [switch]
         $toChangelog
+        ,
+        [string]
+        $RemoteName = 'origin'
     )
     # Settings
     Begin {
@@ -64,7 +67,7 @@
 
         # Instantiate GitLog as an Object so that we can work with it
         If ($Latest) {
-            $gitlog = (git log $CurrentBranch -500 --format="%ai`t%H`t%an`t%s" )
+            $gitlog = (git log $RemoteName$CurrentBranch -500 --format="%ai`t%H`t%an`t%s" )
         } Else {
             $gitlog = (git log --format="%ai`t%H`t%an`t%s" )
         }
