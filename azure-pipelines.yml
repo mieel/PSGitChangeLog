@@ -7,11 +7,11 @@ trigger:
   branches:
     include: 
     - master
-    paths:
-      include:
-      - '*'        
-      exclude:
-      - '**/*.md'
+  paths:
+    include:
+    - '*'        
+    exclude:
+    - '**/*.md'
 
 pool:
   vmImage: 'windows-latest'
@@ -40,6 +40,7 @@ steps:
       testResultsFiles: '**/Test*.xml'
 
   - powershell: |
+      If ('$(BUILD.SOURCEVERSIONMESSAGE)' -match 'semver:' )
       $Module = find-module psgitchangelog
 
       [version]$Version = $Module.Version
@@ -49,7 +50,7 @@ steps:
       Write-Host New SemVer is: $NewVersion
       Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
       git tag $NewVersion
-    displayName: New Semver
+    displayName: Increment Semver
 
   - powershell: |
       Import-Module ./PSGitChangeLog -Force
