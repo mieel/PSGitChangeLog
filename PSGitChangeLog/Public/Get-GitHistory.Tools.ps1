@@ -97,7 +97,7 @@
                 $IntentCode = 'Other'
             }
 
-            If ($Message -lt $RequiredCommitMessageLength) {
+            If ($Message.Length -lt $RequiredCommitMessageLength) {
                 Write-Host "Commit message: $message is considered too short ($RequiredCommitMessageLength). Ommitting from changelog..."
                 Continue
             }
