@@ -45,10 +45,10 @@ steps:
     displayName: New Semver
 
   - powershell: |
-      Install-Module PSGitChangeLog -Scope CurrentUser -Force
-      Import-Module PSGitChangeLog
+      Import-Module ./PSGitChangeLog -Force
       Get-GitChangelog -OutputAs md -latest Build | Set-Content Changelog.md -Encoding utf8
     displayName: Create Changelog
+
   - task: PowerShell@2
     inputs:
       filePath: 'Publish-ToPSGallery.ps1'
