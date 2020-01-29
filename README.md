@@ -10,12 +10,9 @@ Each Intent also has an order in which it would appear on the Changelog. For exa
 
 # Example
 A raw git log would look something like this:
-```2019-11-21 22:17:53 +0100	2766127adc09112a02c8bdec83c42cb77d2ffe1b	michiel thai	💚 use Force when installing modules
-2019-11-21 22:14:47 +0100	235db4f0505beb00dff89dcc1c6a9d24b9c8bc41	mieel	Update README.md
-2019-11-21 22:14:29 +0100	03cd764e76c73d43ccad3c106e594e2d14dc101c	mieel	Update README.md
-2019-11-21 22:07:36 +0100	3d1c105f098160c554fe78b35339f5f623b1f536	mieel	💚 create local git tag so that it shows on the changelog
-2019-11-21 22:01:44 +0100	e8b4a5af08fdc0c9e3103aac82e37e8417f3b1e3	mieel	💚 use UTF8 encoding
-2019-11-21 21:59:38 +0100	818d1a43633b856c43f9bb30b61d5830eae2f1a9	mieel	💚 use UTF8 encoding
+```
+.
+..
 ...
 2019-11-21 21:32:17 +0100	4e15ef11479edb20afbeee75181d91bc9df0948a	mieel	💚 ensure Pester
 2019-11-21 21:29:28 +0100	2c5f3e11d2e5f20a8578625ebba1939cf3b4a658	michiel thai	💚 fix publish script
@@ -37,23 +34,15 @@ A raw git log would look something like this:
 2019-11-21 19:29:39 +0100	d1fc8f82647e7c6b9f5a93c243bf502c9c00d352	mieel	Update azure-pipelines.yml for Azure Pipelines
 2019-11-21 19:27:10 +0100	d5372e7332d0e2fdbfdfa4fc22c5d0afaa465bc1	mieel	Add Testresults, New SemVerId
 2019-11-21 19:19:06 +0100	1c9d5ac74c2b57cb160246eb949d18afad3aa01c	michiel thai	Merge branch 'master' of https://github.com/mieel/PSGitChangeLog
-2019-11-21 19:18:31 +0100	0ae30e60bc474d49c78adf6ebfd56cffa1dec56b	michiel thai	✨ Add Publish to PSGallery script
-2019-11-20 13:05:37 +0100	7c859910e6d0877e6c0547fea6516ae14abef97e	michiel thai	👷‍♂️ Publish script to PSGAllery
-2019-11-21 19:16:03 +0100	f8c1a2b9655caa4ee07ed3554baeb872d24d3028	mieel	Add PSSA
-2019-11-20 13:19:39 +0100	caedb4128e5dd352edf922b8c0bc1272f11184bf	mieel	Update azure-pipelines.yml for Azure Pipelines
-2019-11-20 13:06:58 +0100	77619566d02351c5420207161209f0b65c339d26	mieel	Update azure-pipelines.yml for Azure Pipelines
-2019-11-20 12:55:18 +0100	21839c59b12af202a04bd72c2c68d17173707d9b	mieel	Update azure-pipelines.yml for Azure Pipelines
-2019-11-20 12:52:21 +0100	2ae39ba372abf60f43661f7717ca2c96c512b395	mieel	Set up CI with Azure Pipelines
-2019-11-20 12:07:21 +0100	8322d1c376d3dfb4bc3f3817a8100aeb2298b1fa	michiel thai	✅ Add Project Tests
-2019-11-20 09:56:05 +0100	055c97cadbe559aaeab241cfa0e054a843947982	mieel	Create build.yml
-2019-11-20 09:54:27 +0100	8173f535a0a2a0dce382bd6a462b48b080bcb4bb	michiel thai	👌 Add support for lightweight tags
-2019-11-20 09:25:27 +0100	e134e7ab36f899f02f31bf7be5e86ac90ab99ac9	michiel thai	⚙ Add psm1, psd1 file
-2019-11-19 20:08:18 +0100	cd1e997abe21e919387878bee3dd0435ec465894	mieel	Create Get-GitHistory.Tools.ps1
-2019-11-19 19:54:31 +0100	4ef77cc35e82c4692fb687048d789db48b9d5aa9	mieel	Create Get-GitTagList.Tools.ps1
-2019-11-19 19:52:42 +0100	858dbdf357dd5fb2479f900e8b304160e1ea3563	mieel	Initial commit
+...
+..
+.
 ```
 Using this module you can get a MD output:
 
+.
+..
+...
 ### 0.0.4 [👨‍💻](https://github.com/mieel/PSGitChangeLog/commit/818d1a43633b856c43f9bb30b61d5830eae2f1a9)  11/21/2019 20:59:38 
 #### Configuration, Testing
  - 💚 use UTF8 encoding - @[818d1a43](https://github.com/mieel/PSGitChangeLog/commit/818d1a43)
@@ -88,21 +77,11 @@ Using this module you can get a MD output:
  
 #### Bugs, Problems
  - 🐛 Fix where empty TagPrefix would be a component - @[681293c7](https://github.com/mieel/PSGitChangeLog/commit/681293c7)
- 
-### 0.0.2 [👨‍💻](https://github.com/mieel/PSGitChangeLog/commit/8173f535a0a2a0dce382bd6a462b48b080bcb4bb)  11/20/2019 08:54:27 
-#### New features, Improvements
- - 👌 Add support for lightweight tags - @[8173f535](https://github.com/mieel/PSGitChangeLog/commit/8173f535)
- 
-### 0.0.1 [👨‍💻](https://github.com/mieel/PSGitChangeLog/commit/e134e7ab36f899f02f31bf7be5e86ac90ab99ac9)  11/20/2019 08:25:27 
-#### Other
- - Create Get-GitTagList.Tools.ps1 - @[4ef77cc3](https://github.com/mieel/PSGitChangeLog/commit/4ef77cc3)
- - Initial commit - @[858dbdf3](https://github.com/mieel/PSGitChangeLog/commit/858dbdf3)
- - Create Get-GitHistory.Tools.ps1 - @[cd1e997a](https://github.com/mieel/PSGitChangeLog/commit/cd1e997a)
- 
-#### Configuration, Testing
- - ⚙ Add psm1, psd1 file - @[e134e7ab](https://github.com/mieel/PSGitChangeLog/commit/e134e7ab)
+...
+..
+.
 
-Or Json
+Or you can output it to Json if you want to apply your own formatting logic
 
 ```
 {
@@ -183,9 +162,10 @@ Only output latest x version
 Get all Tag/Releases
 `Get-GitTagList`
 
-# Use it in CI
+# Use it in CI Platform
 ```
-# PowerShell Task
+# Use PowerShell Task
+# The below task will generate a Changelog.md file
 Install-Module PSGitChangeLog -Scope CurrentUser -Force
 Import-Module PSGitChangeLog
 Get-GitChangelog -OutputAs md | Set-Content Changelog.md -Encoding utf8

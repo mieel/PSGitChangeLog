@@ -3,8 +3,15 @@
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-  - master
+trigger: 
+  branches:
+    include: 
+    - master
+  paths:
+    include:
+    - '*'        
+    exclude:
+    - '**/*.md'
 
 pool:
   vmImage: 'windows-latest'
@@ -33,6 +40,7 @@ steps:
       testResultsFiles: '**/Test*.xml'
 
   - powershell: |
+      If ('$(BUILD.SOURCEVERSIONMESSAGE)' -match 'semver:' )
       $Module = find-module psgitchangelog
 
       [version]$Version = $Module.Version
@@ -42,13 +50,13 @@ steps:
       Write-Host New SemVer is: $NewVersion
       Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
       git tag $NewVersion
-    displayName: New Semver
+    displayName: Increment Semver
 
   - powershell: |
-      Install-Module PSGitChangeLog -Scope CurrentUser -Force
-      Import-Module PSGitChangeLog
+      Import-Module ./PSGitChangeLog -Force
       Get-GitChangelog -OutputAs md -latest Build | Set-Content Changelog.md -Encoding utf8
     displayName: Create Changelog
+
   - task: PowerShell@2
     inputs:
       filePath: 'Publish-ToPSGallery.ps1'
