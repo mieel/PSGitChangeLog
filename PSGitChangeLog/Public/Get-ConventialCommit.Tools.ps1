@@ -26,7 +26,7 @@ Function Get-ConventialCommit {
         If ( $CommitMessage -match ("{0}" -f $CurrentCode )) {
             $Match = $matches[0]
             $Matchedcode = $CurrentCode
-            Write-Host $Matchedcode
+            Write-Information $Matchedcode
             # Scope is mentioned after the code with no semicolon ':'
             If ( $CommitMessage -match ("{0}\(\w*\)" -f $Matchedcode )) {
                 $Match = $matches[0]
@@ -35,7 +35,7 @@ Function Get-ConventialCommit {
                 If ($Match -match "\(\w*\)") {
                     $MatchedScope = Get-ConventialCommitScope $matches[0]
                 }
-                Write-Host $Matchedcode mentions Scope $MatchedScope
+                Write-Information "$Matchedcode mentions Scope $MatchedScope"
             }
         } Else {
             # Scope is mentioned between brackets () before a semecolon ':'
@@ -47,7 +47,7 @@ Function Get-ConventialCommit {
                 If ($Match -match "\(\w*\):") {
                     $MatchedScope = Get-ConventialCommitScope $matches[0]
                 }
-                Write-Host $Matchedcode with codebase $codebase mentions Scope $MatchedScope
+                Write-Information "$Matchedcode with codebase $codebase mentions Scope $MatchedScope"
             }
         }
         If ($Matchedcode) {
@@ -123,7 +123,7 @@ Function Get-ConventialCommitScope2 {
         If ($Match -match "\(\w*\)$SC") {
             $MatchedScope = Get-ConventialCommitScope $matches[0]
         }
-        Write-Host $Matchedcode with codebase $codebase mentions Scope $MatchedScope
+        Write-Information "$Matchedcode with codebase $codebase mentions Scope $MatchedScope"
     }
     $Code
     $CodeBase
