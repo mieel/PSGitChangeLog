@@ -4,16 +4,16 @@
             Converts gitlog output into structured format
         .DESCRIPTION
             Gets Commit data from gitlog and gets Tags.
-            Orders Commit by their tag and outputs in a list of objects or a nested json document (use -asJson)
+            Orders Commit by their tag and outputs in a list of objects or a nested json document (use -OutputAs Json)
             You can also specify to only output history from the latest major/minor/build.
         .EXAMPLE
-            Get-GitHistory -TagPrefix WebApp -asJson
+            Get-GitHistory -TagPrefix WebApp -OutputAs Json
         .EXAMPLE
-            $json = Get-GitHistory -asJson
+            $json = Get-GitHistory -OutputAs Json
         .EXAMPLE
-            $json = Get-GitHistory -asJson -Latest Major
-            $json = Get-GitHistory -asJson -Latest Minor
-            $json = Get-GitHistory -asJson -Latest Build
+            $json = Get-GitHistory -OutputAs Json -Latest Major
+            $json = Get-GitHistory -OutputAs Json -Latest Minor
+            $json = Get-GitHistory -OutputAs Json -Latest Build
     #>
     [cmdletbinding()]
     param(
@@ -36,16 +36,23 @@
         [string]
         $RemoteName = 'origin'
         ,
-        [ValidateSet("psobject", "json", "md", "html")]
+        [ValidateSet("psobject", "json")]
         [string]
-        $OutputAs
+        $OutputAs = 'psobject'
         ,
+        [ValidateSet("Major", "Minor", "Build")]
         [String]
-        $Latest = ''
+        $Latest
         # Specify to retrieve the latest Major, Minor, Build
         ,
         [switch]
         $toChangelog
+        ,
+        [switch]
+        $GitVersionContiniousDeploymentMode
+        ,
+        [int]
+        $FetchDepth = 500
     )
     # Settings
     Begin {
@@ -63,18 +70,19 @@
         If ($WorkDir) { Set-Location $WorkDir }
 
         # Instantiate GitLog as an Object so that we can work with it
-        If ($Latest) {
-            $gitlog = (git log $CurrentBranch -500 --format="%ai`t%H`t%an`t%s" )
-        } Else {
-            $gitlog = (git log --format="%ai`t%H`t%an`t%s" )
-        }
+        $gitlog = (git log -$FetchDepth --format="%ai`t%H`t%an`t%s")
+
         $gitHist = $gitlog | ConvertFrom-Csv -Delimiter "`t" -Header ("Date", "CommitId", "Author", "Subject")
 
-        $Releases = Get-GitTagList -TagPrefix $TagPrefix
+        $ExtraParams = @{ }
+        If ($GitVersionContiniousDeploymentMode) {
+            $ExtraParam.Add('GitVersionContiniousDeploymentMode', $GitVersionContiniousDeploymentMode)
+        }
+        $Releases = Get-GitTagList -TagPrefix $TagPrefix @ExtraParams
 
         $TagValue = 'Unreleased'
 
-        ForEach ($Commit in $gitHist) {
+        $Logs = ForEach ($Commit in $gitHist) {
             #Set the current Version/Tag in the history
             $tag = $Releases | Where-Object { $_.Commit -eq $Commit.commitid } | Select-Object -last 1
             if ($tag) {
@@ -98,7 +106,7 @@
             }
 
             If ($Message -lt $RequiredCommitMessageLength) {
-                Write-Host "Commit message: $message is considered too short ($RequiredCommitMessageLength). Ommitting from changelog..."
+                Write-Information "Commit message: $message is considered too short ($RequiredCommitMessageLength). Ommitting from changelog..."
                 Continue
             }
             $IssueKey = Test-IssueKey($Commit.Subject)
@@ -119,102 +127,14 @@
 
             Write-Output $log
         } #ForEach
+
+        Switch ($OutputAs) {
+            'json' {
+                Write-Output $logs | ConvertTo-Json -Depth 5
+            } Default {
+                Write-Output $logs
+            }
+        }
     }
 }
 
-Function Get-GitChangeLog {
-    Param (
-        [ValidateSet("Public", "Internal")]
-        [string]
-        $Audience
-        ,
-        [string]
-        $WorkDir
-        ,
-        [int]
-        $RequiredCommitMessageLength = 5
-        ,
-        [string]
-        $ProjectName
-        ,
-        [string]
-        $TagPrefix
-        ,
-        [string]
-        $RemoteName = 'origin'
-        ,
-        [ValidateSet("psobject", "json", "md", "html")]
-        [string]
-        $OutputAs
-        ,
-        [String]
-        $Latest = ''
-        # Specify to retrieve the latest Major, Minor, Build
-        ,
-        [switch]
-        $toChangelog
-    )
-    $logs = Get-GitHistory @PSBoundParameters
-    $Releases = Get-GitTagList -TagPrefix $TagPrefix
-
-    If ($Audience -eq 'Public' ) {
-        $logs = $logs | Where-Object { $_.IntentAudience -ne 'Internal' }
-    }
-    If ($OutputAs -eq 'psobject') { return $logs }
-
-    $Releasedata = @()
-
-    If ($Latest) {
-        $Major = $Releases.Major | Select-Object -first 1
-        $Minor = ($Releases | Where-Object { $_.Major -eq $Major } ).Minor | Select-Object -first 1
-        Write-Host "Getting Releases of Latest $Latest"
-        If ($Latest -eq 'Build') {
-            $Releases = $Releases | Select-Object -first 1
-        } ElseIf ($Latest -eq 'Major') {
-            $Major = $Releases.Major | Select-Object -first 1
-            Write-Host "$latest $major"
-            $Releases = $Releases | Where-Object { $_.Major -eq $Major }
-        } ElseIf ($Latest -eq 'Minor') {
-            Write-Host "$latest $Major.$Minor"
-            $Releases = $Releases | Where-Object { $_.Major -eq $Major -and $_.Minor -eq $Minor }
-        }
-    }
-    If ($logs | Where-Object { $_.Release -eq 'Unreleased' } ) {
-        $Releasedata += [ordered]@{
-            Release       = 'Unreleased'
-            ReleaseDate   = ''
-            Component     = ''
-            Version       = ''
-            ReleaseCommit = git log --format="%H" -n 1
-            Commits       = $logs | Where-Object { $_.Release -eq 'Unreleased' } | SOrt-Object -Property Order | Select-Object -Property * -ExcludeProperty Project, Release, Order
-        }
-    }
-    Write-Host $Releases.Count Releases
-    $Releasedata += ForEach ($Release in $Releases) {
-        [ordered]@{
-            Release       = $Release.Tag
-            ReleaseDate   = $Release.Date
-            Component     = $Release.Component
-            Version       = [string]$Release.SemVerId
-            ReleaseCommit = $Release.Commit
-            Commits       = $logs | Where-Object { $_.Release -eq $Release.Tag } | SOrt-Object -Property Order | Select-Object -Property * -ExcludeProperty Project, Release, Order
-        }
-    }
-
-    $Data = @{
-        Project  = $ProjectName
-        Releases = $Releasedata
-    }
-
-    $Json = $Data | ConvertTo-Json -depth 4
-
-    If ($OutputAs -eq 'json') { Return $json }
-
-    If ($OutputAs -eq 'md') {
-        $Changelog = ConvertTo-Changelog($Json) -FormatAs md
-        Return $Changelog
-    } elseif ($OutputAs -eq 'html') {
-        $Changelog = ConvertTo-Changelog($Json) -FormatAs html
-        Return $Changelog
-    }
-}
