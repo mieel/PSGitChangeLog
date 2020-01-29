@@ -5,13 +5,13 @@
             Supported formats: .MD (default), .html
         .EXAMPLE
             $json =  Get-GitHistory -asJson -Latest Major -tagprefix WebApp
-            Convert-ChangeLog ($json) -FormatAs md
-            Convert-ChangeLog ($json) -FormatAs html | Set-Clipboard
+            Convert-ChangeLog -InputObject $json -FormatAs md
+            Convert-ChangeLog -InputObject $json -FormatAs html | Set-Clipboard
 
     #>
     Param(
         [Parameter(ValueFromPipeline = $true)]
-        $InputObject = $json
+        $InputObject
         ,
         #
         [ValidateSet("md", "html")]
@@ -27,17 +27,17 @@
 
     )
     Begin {
-       
+
         $config = Import-PowerShellDataFile -Path  $PSScriptRoot/../PSGitChangeLog.Config.psd1
         $PackageUri = $config.PackageUri
         $CommitBaseUri = $config.CommitBaseUri
         $IssueLinkUri = $config.IssueLinkUri
 
-        $Data = $InputObject | ConvertFrom-Json
-        $Releases = $Data.Releases        
-        
+        $Data = $InputObject
+        $Releases = $Data.Releases
+
         $Components = $Releases.Component | Select-Object -Unique
-        Write-Host "Documenting $($Releases.Release -join ', ')"
+        Write-Information "Documenting $($Releases.Release -join ', ')"
     }
     Process {
 
@@ -49,7 +49,7 @@
             }
         }
         ForEach ($Component in $Components) {
-            If ($Component -notin $null,'') {
+            If ($Component -notin $null, '') {
                 $content += Switch ($formatAs) {
                     'md' { Write-Output  "`n# Component: $Component" }
                     'html' { Write-Output "`n<h1>Component: $Component</h1>" }
