@@ -13,14 +13,15 @@
         $TagPrefix
         ,
         [switch]
-        $Latest
+        $LatestTag
         ,
         [switch]
         $GitVersionContiniousDeploymentMode
+        # If a version has multiple prelease tags, the most recent one is outputted
     )
 
     $gittagdata = git for-each-ref --sort=taggerdate --format='%(if)%(*objectname)%(then)%(*objectname)%(else)%(objectname)%(end)##%(refname)##%(taggerdate:iso)' refs/tags
-    If ($TagPrefix -notin $null,'') {
+    If ($TagPrefix -notin $null, '') {
         $gittagdata = $gittagdata | Where-Object { $_ -match "refs/tags/$TagPrefix-" }
     }
     $taglist = @()
@@ -33,7 +34,7 @@
 
         $tagParts = $tagvalue -Split '-'
         ForEach ($tagPart in $tagParts) {
-            If ($TagPrefix -notin $null,'' -and $tagPart -eq $TagPrefix) { continue }
+            If ($TagPrefix -notin $null, '' -and $tagPart -eq $TagPrefix) { continue }
             $tagPart = $tagPart.Replace('v', '')
             Try {
                 # Tags needs to be a valid SemVerId
@@ -42,12 +43,12 @@
                 $tagDate = [datetime]::ParseExact($date.Substring(0, 19), 'yyyy-MM-dd HH:mm:ss', $null)
 
                 Try {
-                    if ($TagPrefix) { 
+                    if ($TagPrefix) {
                         $tag = "$TagPrefix-$SemVerId"
-                        $component = $TagPrefix 
-                    } Else { 
+                        $component = $TagPrefix
+                    } Else {
                         $tag = "$TagValue"
-                        $Component = If ($tagParts.count -gt 1) {$tagParts | Select-Object -First 1} Else {''}
+                        $Component = If ($tagParts.count -gt 1) { $tagParts | Select-Object -First 1 } Else { '' }
                     }
                     $taglist += [pscustomobject]@{
                         Tag       = $Tag
@@ -70,12 +71,12 @@
         }
     }
     $taglist = $taglist | Sort-Object -Property Component, SemVerId -Descending
-    If ($Latest) {
+    If ($LatestTag) {
         Return $taglist | Select-Object -First 1
     }
 
     If ($GitVersionContiniousDeploymentMode) {
-        $tagsGrouped = ($list | Group-Object -Property Tag)
+        $tagsGrouped = ($taglist | Group-Object -Property Tag)
         ForEach ($group in $tagsGrouped) {
             Write-Verbose "$($group.Name) has latest commit:"
             $commit = $Group.Group | Sort-Object -Property Date | Select-Object -first 1
