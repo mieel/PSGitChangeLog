@@ -59,7 +59,6 @@
         # Ensuring Encoding
         $env:LC_ALL = 'C.UTF-8'
         [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-        $CurrentBranch = $env:Build_SourceBranchName
         $config = Import-PowerShellDataFile -Path $PSScriptRoot/../PSGitChangeLog.Config.psd1
         $Omit = $config.Omit
     }

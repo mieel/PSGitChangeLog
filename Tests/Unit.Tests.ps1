@@ -2,7 +2,7 @@
 . $PSScriptRoot\TestHeader.Template.ps1
 
 Describe "Test-IssueKey" -Tag Unit {
-    $keys = @('ISSUE-1', 'ISSUE-1213', 'KEY-23')
+    $keys = @('ISSUE-1', 'ISSUE-1213', 'KEY-23','C2C-123')
     $keys | ForEach-Object {
         it "$_ in a commit message should be parsed as a key" {
             $key = Test-IssueKey("Commit message mentions $_ somwhere ")
