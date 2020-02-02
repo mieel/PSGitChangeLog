@@ -48,6 +48,7 @@ steps:
     displayName: Increment Semver
 
   - powershell: |
+      # Import instead of Install because we want to dog food the latest source
       Import-Module ./PSGitChangeLog -Force
       Get-GitChangelog -OutputAs md -latest Build | Set-Content Changelog.md -Encoding utf8
     displayName: Create Changelog
