@@ -50,7 +50,10 @@ steps:
   - powershell: |
       # Import instead of Install because we want to dog food the latest source
       Import-Module ./PSGitChangeLog -Force
-      Get-GitChangelog -OutputAs md -latest Build | Set-Content Changelog.md -Encoding utf8
+      Get-GitTagList
+      Get-GitHistory
+      $Changelog = Get-GitChangelog
+      $Changelog | Set-Content Changelog.md -Encoding utf8
     displayName: Create Changelog
 
   - task: PowerShell@2
