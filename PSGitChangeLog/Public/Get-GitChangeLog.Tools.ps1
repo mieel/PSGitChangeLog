@@ -50,7 +50,7 @@ Function Get-GitChangeLog {
     If (!$Logs) {
         $logs = Get-GitHistory -TagPrefix $tagPrefix -FetchDepth $FetchDepth -GitVersionContiniousDeploymentMode:$GitVersionContiniousDeploymentMode
     }
-    $Releases = Get-GitTagList -TagPrefix $TagPrefix
+    $Releases = Get-GitTagList -TagPrefix $TagPrefix -GitVersionContiniousDeploymentMode:$GitVersionContiniousDeploymentMode
 
     If ($Audience -eq 'Public' ) {
         $logs = $logs | Where-Object { $_.IntentAudience -ne 'Internal' }

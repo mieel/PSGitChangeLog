@@ -73,9 +73,11 @@
 
         $gitHist = $gitlog | ConvertFrom-Csv -Delimiter "`t" -Header ("Date", "CommitId", "Author", "Subject")
 
-        $ExtraParams = @{ }
+        
         If ($GitVersionContiniousDeploymentMode) {
-            $ExtraParam.Add('GitVersionContiniousDeploymentMode', $GitVersionContiniousDeploymentMode)
+            $ExtraParams = @{
+                GitVersionContiniousDeploymentMode = $True
+            }
         }
         $Releases = Get-GitTagList -TagPrefix $TagPrefix @ExtraParams
 
