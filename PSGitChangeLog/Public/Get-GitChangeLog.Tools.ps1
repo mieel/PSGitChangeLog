@@ -43,9 +43,12 @@ Function Get-GitChangeLog {
         ,
         [int]
         $FetchDepth = 500
+        ,
+        [switch]
+        $GitVersionContiniousDeploymentMode
     )
     If (!$Logs) {
-        $logs = Get-GitHistory -TagPrefix $tagPrefix -FetchDepth $FetchDepth
+        $logs = Get-GitHistory -TagPrefix $tagPrefix -FetchDepth $FetchDepth -GitVersionContiniousDeploymentMode:$GitVersionContiniousDeploymentMode
     }
     $Releases = Get-GitTagList -TagPrefix $TagPrefix
 
