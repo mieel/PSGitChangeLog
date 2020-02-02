@@ -38,16 +38,11 @@ steps:
     inputs:
       testResultsFormat: 'NUnit'
       testResultsFiles: '**/Test*.xml'
-
+  - task: GitVersion@5
+    inputs:
+      runtime: 'core'
   - powershell: |
-      If ('$(BUILD.SOURCEVERSIONMESSAGE)' -match 'semver:' )
-      $Module = find-module psgitchangelog
-
-      [version]$Version = $Module.Version
-
-      $NewVersion = "{0}.{1}.{2}" -f $version.Major,$version.Minor,($version.Build + 1)
-
-      Write-Host New SemVer is: $NewVersion
+      $NewVersion = $env:GitVersion_MajorMinorPatch
       Write-Host "##vso[task.setvariable variable=Build.SemVerId;]$NewVersion"
       git tag $NewVersion
     displayName: Increment Semver
