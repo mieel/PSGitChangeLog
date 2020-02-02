@@ -32,6 +32,12 @@ Function Get-GitChangeLog {
         $Latest = ''
         # Specify to retrieve the latest Major, Minor, Build
         ,
+        [int]
+        $Major
+        ,
+        [int]
+        $Minor
+        ,
         [switch]
         $toChangelog
         ,
@@ -48,9 +54,19 @@ Function Get-GitChangeLog {
     }
 
     $Releasedata = @()
-
+    $filterReleaseParams =@{}
+    
     If ($Latest) {
-        $Releases = Get-FilteredRelease -Latest $Latest -Releases $Releases
+        $filterReleaseParams.Add('Latest',$Latest)
+    }
+    If ($Major) {
+        $filterReleaseParams.Add('Major',$Major)
+    }
+    If ($Minor) {
+        $filterReleaseParams.Add('Minor',$Minor)
+    }
+    If ($filterReleaseParams) {
+        $Releases = Get-FilteredRelease @filterReleaseParams -Releases $Releases
     }
     # Print unreleased changes first if any
     If ($logs | Where-Object { $_.Release -eq 'Unreleased' } ) {
