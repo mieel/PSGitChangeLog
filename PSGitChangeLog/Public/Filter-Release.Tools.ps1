@@ -1,4 +1,9 @@
 Function Get-FilteredRelease {
+    <#
+        .EXAMPLE
+            $Releases = Get-GitTagList -TagPrefix WebApp
+            Get-FilteredRelease -Major 6 -Releases $Releases
+    #>
     Param (
         $Major
         ,
